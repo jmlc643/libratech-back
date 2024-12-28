@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "author")
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"author_name", "author_last_name"})})
 public class Author {
 
     @Id
