@@ -16,7 +16,7 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_book")
-    private Integer id_book;
+    private Integer idBook;
 
     @Column(name = "available", nullable = false)
     private Boolean available;

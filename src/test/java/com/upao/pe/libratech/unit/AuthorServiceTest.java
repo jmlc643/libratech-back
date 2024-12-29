@@ -56,7 +56,7 @@ public class AuthorServiceTest {
 
         // Then
         assertThat(result).isNotEmpty();
-        assertThat(result.size()).isEqualTo(3);
+        assertThat(result).hasSize(3);
         assertThat(result.getFirst().getAuthorName()).isEqualTo("Thomas");
         assertThat(result.getFirst().getAuthorLastName()).isEqualTo("Cormen");
         verify(authorRepository).findAll(pageable);

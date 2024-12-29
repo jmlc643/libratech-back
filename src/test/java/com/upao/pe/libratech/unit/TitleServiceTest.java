@@ -58,7 +58,7 @@ public class TitleServiceTest {
 
         // Then
         assertThat(result).isNotEmpty();
-        assertThat(result.size()).isEqualTo(3);
+        assertThat(result).hasSize(3);
         assertThat(result.getFirst().getTitleName()).isEqualTo("Introduction to Algorithms");
         assertThat(result.getLast().getTitleName()).isEqualTo("The Pragmatic Programmer");
         verify(titleRepository).findAll(pageable);

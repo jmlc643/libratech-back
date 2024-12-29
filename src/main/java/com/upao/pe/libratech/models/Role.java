@@ -17,11 +17,11 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_role")
-    private Integer id_role;
+    private Integer idRole;
 
     @Column(name = "role_name", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ERole role_name;
+    private ERole roleName;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private List<User> users;

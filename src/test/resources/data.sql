@@ -1,8 +1,8 @@
 -- Insertar datos en la tabla roles
 INSERT INTO roles (role_name) VALUES
-                                  ('Student'),
-                                  ('Teacher'),
-                                  ('Administrator');
+                                  ('STUDENT'),
+                                  ('TEACHER'),
+                                  ('ADMIN');
 
 -- Insertar datos en la tabla users
 INSERT INTO users (user, email, password, role_id) VALUES

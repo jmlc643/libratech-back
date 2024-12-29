@@ -59,7 +59,7 @@ public class CategoryServiceTest {
 
         // Then
         assertThat(result).isNotEmpty();
-        assertThat(result.size()).isEqualTo(3);
+        assertThat(result).hasSize(3);
         assertThat(result.getFirst().getCategoryName()).isEqualTo("Computer Science");
         assertThat(result.getLast().getCategoryName()).isEqualTo("Programming");
         verify(categoryRepository).findAll(pageable);
