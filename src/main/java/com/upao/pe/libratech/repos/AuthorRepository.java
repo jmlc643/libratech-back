@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, Integer> {
     Page<Author> findAll(Pageable pageable);
+
+    boolean existsByAuthorNameAndAuthorLastName(String authorName, String authorLastName);
 }

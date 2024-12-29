@@ -1,6 +1,7 @@
 package com.upao.pe.libratech.services;
 
 import com.upao.pe.libratech.dtos.author.AuthorDTO;
+import com.upao.pe.libratech.exceptions.ResourceAlreadyExistsException;
 import com.upao.pe.libratech.models.Author;
 import com.upao.pe.libratech.repos.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,12 @@ public class AuthorService {
 
     // CREATE
     public AuthorDTO createAuthor(AuthorDTO authorDTO) {
+        if(authorRepository.existsByAuthorNameAndAuthorLastName(authorDTO.getAuthorName(), authorDTO.getAuthorLastName())) {
+            throw new ResourceAlreadyExistsException("El autor ya existe");
+        }
         Author author = new Author(null, authorDTO.getAuthorName(), authorDTO.getAuthorLastName(), new ArrayList<>());
         authorRepository.save(author);
-        return authorDTO;
+        return returnAuthorDTO(author);
     }
 
     private AuthorDTO returnAuthorDTO(Author author) {

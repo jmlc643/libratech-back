@@ -1,6 +1,7 @@
 package com.upao.pe.libratech.unit;
 
 import com.upao.pe.libratech.dtos.author.AuthorDTO;
+import com.upao.pe.libratech.exceptions.ResourceAlreadyExistsException;
 import com.upao.pe.libratech.models.Author;
 import com.upao.pe.libratech.repos.AuthorRepository;
 import com.upao.pe.libratech.services.AuthorService;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -77,6 +79,19 @@ public class AuthorServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getAuthorName()).isEqualTo("German");
         assertThat(result.getAuthorLastName()).isEqualTo("Garmendia");
+    }
+
+    @Test
+    void testCreateAuthorWhenAuthorExists() {
+        // Given
+        AuthorDTO authorDTO = new AuthorDTO("Thomas", "Cormen");
+
+        // When
+        when(authorRepository.existsByAuthorNameAndAuthorLastName(authorDTO.getAuthorName(), authorDTO.getAuthorLastName())).thenReturn(true);
+        ResourceAlreadyExistsException ex = assertThrows(ResourceAlreadyExistsException.class, () -> authorService.createAuthor(authorDTO));
+
+        // Then
+        assertThat(ex.getMessage()).isEqualTo("El autor ya existe");
     }
 
 }
