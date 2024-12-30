@@ -3,6 +3,7 @@ package com.upao.pe.libratech.unit;
 import com.upao.pe.libratech.dtos.author.AuthorDTO;
 import com.upao.pe.libratech.exceptions.ResourceAlreadyExistsException;
 import com.upao.pe.libratech.models.Author;
+import com.upao.pe.libratech.models.Book;
 import com.upao.pe.libratech.repos.AuthorRepository;
 import com.upao.pe.libratech.services.AuthorService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,11 +40,11 @@ public class AuthorServiceTest {
     @BeforeEach
     void setUp(){
         authors = List.of(
-                new Author(1, "Thomas", "Cormen", null),
+                new Author(1, "Thomas", "Cormen", List.of(new Book(1, true, null, null, null, null), new Book(2, false, null, null, null, null))),
                 new Author(2, "Robert", "Martin", null),
                 new Author(3, "Andrew", "Hunt", null),
                 new Author(4, "Erich", "Gamma", null),
-                new Author(5, "Stuart", "Russell", null));
+                new Author(5, "Stuart", "Russell", List.of(new Book(1, false, null, null, null, null))));
     }
 
     @Test
@@ -97,6 +99,56 @@ public class AuthorServiceTest {
 
         // Then
         assertThat(ex.getMessage()).isEqualTo("El autor ya existe");
+    }
+
+    @Test
+    void testUpdateAuthorWhenBooksIsGreaterThanOne() {
+        // Given
+        int id = 1;
+        Author authorBeforeUpdate = authors.getFirst();
+        Author authorAfterUpdate = new Author(6, "Tomas", "Cornelio", List.of(new Book(1, true, null, authorBeforeUpdate, null, null)));
+
+        // When
+        when(authorRepository.findById(id)).thenReturn(Optional.of(authorBeforeUpdate));
+        when(authorRepository.existsByAuthorNameAndAuthorLastName("Tomas", "Cornelio")).thenReturn(false);
+        when(authorRepository.save(any(Author.class))).thenReturn(authorAfterUpdate);
+
+        Author result = authorService.updateAuthor(authorAfterUpdate.getAuthorName(), authorAfterUpdate.getAuthorLastName(), id);
+
+        // Then
+        ArgumentCaptor<Author> authorArgumentCaptor = ArgumentCaptor.forClass(Author.class);
+        verify(authorRepository).save(authorArgumentCaptor.capture());
+        assertThat(authorArgumentCaptor.getValue().getAuthorLastName()).isEqualTo("Cornelio");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIdAuthor()).isEqualTo(6);
+        assertThat(result.getAuthorName()).isEqualTo("Tomas");
+        assertThat(result.getAuthorLastName()).isEqualTo("Cornelio");
+    }
+
+    @Test
+    void testUpdateAuthorWhenBooksIsEqualThanOne() {
+        // Given
+        int id = 5;
+        Author authorBeforeUpdate = authors.getLast();
+        Author authorAfterUpdate = new Author(5, "Stuart", "Litle", List.of(new Book(1, false, null, null, null, null)));
+
+        // When
+        when(authorRepository.findById(id)).thenReturn(Optional.of(authorBeforeUpdate));
+        when(authorRepository.save(any(Author.class))).thenReturn(authorAfterUpdate);
+
+        Author result = authorService.updateAuthor(authorAfterUpdate.getAuthorName(), authorAfterUpdate.getAuthorLastName(), id);
+
+        // Then
+        ArgumentCaptor<Author> authorArgumentCaptor = ArgumentCaptor.forClass(Author.class);
+        verify(authorRepository).save(authorArgumentCaptor.capture());
+        assertThat(authorArgumentCaptor.getValue().getAuthorName()).isEqualTo("Stuart");
+        assertThat(authorArgumentCaptor.getValue().getAuthorLastName()).isEqualTo("Litle");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIdAuthor()).isEqualTo(5);
+        assertThat(result.getAuthorName()).isEqualTo("Stuart");
+        assertThat(result.getAuthorLastName()).isEqualTo("Litle");
     }
 
     @Test
