@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,9 +69,11 @@ public class TitleServiceTest {
     void testCreateTitle() {
         // Given
         TitleDTO title = new TitleDTO("Data Science");
+        Title titleSaved = new Title(6, "Data Science", new ArrayList<>());
 
         // When
-        TitleDTO result = titleService.createTitle(title);
+        when(titleRepository.save(any(Title.class))).thenReturn(titleSaved);
+        Title result = titleService.createTitle(title);
 
         // Then
         ArgumentCaptor<Title> titleArgumentCaptor = ArgumentCaptor.forClass(Title.class);
@@ -78,7 +81,9 @@ public class TitleServiceTest {
         assertEquals("Data Science", titleArgumentCaptor.getValue().getTitleName());
 
         assertThat(result).isNotNull();
+        assertEquals(6, result.getIdTitle());
         assertEquals("Data Science", result.getTitleName());
+        assertThat(result.getBooks()).isEmpty();
     }
 
     @Test
@@ -92,5 +97,18 @@ public class TitleServiceTest {
 
         // Then
         assertThat(ex.getMessage()).isEqualTo("El titulo ya existe");
+    }
+
+    @Test
+    void testReturnTitleDTO() {
+        // Given
+        Title title = titles.getFirst();
+
+        // When
+        TitleDTO result = titleService.returnTitleDTO(title);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getTitleName()).isEqualTo(title.getTitleName());
     }
 }

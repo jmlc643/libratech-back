@@ -19,7 +19,7 @@ public class Book {
     private Integer idBook;
 
     @Column(name = "available", nullable = false)
-    private Boolean available;
+    private boolean available;
 
     @ManyToOne
     @JoinColumn(name = "id_title", nullable = false)

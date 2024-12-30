@@ -25,6 +25,6 @@ public class Author {
     @Column(name = "author_last_name", length = 150, nullable = false)
     private String authorLastName;
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books;
 }

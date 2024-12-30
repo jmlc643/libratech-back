@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,9 +67,11 @@ public class AuthorServiceTest {
     void testCreateAuthor() {
         // Given
         AuthorDTO author = new AuthorDTO("German", "Garmendia");
+        Author savedAuthor = new Author(6, "German", "Garmendia", new ArrayList<>());
 
         // When
-        AuthorDTO result = this.authorService.createAuthor(author);
+        when(authorRepository.save(any(Author.class))).thenReturn(savedAuthor);
+        Author result = this.authorService.createAuthor(author);
 
         // Then
         ArgumentCaptor<Author> authorArgumentCaptor = ArgumentCaptor.forClass(Author.class);
@@ -77,8 +80,10 @@ public class AuthorServiceTest {
         assertEquals("Garmendia", authorArgumentCaptor.getValue().getAuthorLastName());
 
         assertThat(result).isNotNull();
+        assertThat(result.getIdAuthor()).isEqualTo(6);
         assertThat(result.getAuthorName()).isEqualTo("German");
         assertThat(result.getAuthorLastName()).isEqualTo("Garmendia");
+        assertThat(result.getBooks()).isEmpty();
     }
 
     @Test
@@ -92,6 +97,20 @@ public class AuthorServiceTest {
 
         // Then
         assertThat(ex.getMessage()).isEqualTo("El autor ya existe");
+    }
+
+    @Test
+    void testReturnAuthorDTO() {
+        // Given
+        Author author = authors.getFirst();
+
+        // When
+        AuthorDTO result = authorService.returnAuthorDTO(author);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getAuthorName()).isEqualTo(author.getAuthorName());
+        assertThat(result.getAuthorLastName()).isEqualTo(author.getAuthorLastName());
     }
 
 }

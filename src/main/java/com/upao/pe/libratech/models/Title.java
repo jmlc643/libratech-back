@@ -21,6 +21,6 @@ public class Title {
     @Column(name = "title_name", nullable = false)
     private String titleName;
 
-    @OneToMany(mappedBy = "title", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "title", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books;
 }

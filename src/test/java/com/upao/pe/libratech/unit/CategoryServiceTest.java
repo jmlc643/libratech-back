@@ -18,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,9 +70,11 @@ public class CategoryServiceTest {
     void testCreateCategory() {
         // Given
         CategoryDTO category = new CategoryDTO("Data Science");
+        Category categorySaved = new Category(6, "Data Science", new ArrayList<>());
 
         // When
-        CategoryDTO result = this.categoryService.createCategory(category);
+        when(categoryRepository.save(any(Category.class))).thenReturn(categorySaved);
+        Category result = this.categoryService.createCategory(category);
 
         // Then
         ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
@@ -79,7 +82,9 @@ public class CategoryServiceTest {
         assertEquals("Data Science", categoryArgumentCaptor.getValue().getCategoryName());
 
         assertThat(result).isNotNull();
+        assertThat(result.getIdCategory()).isEqualTo(6);
         assertThat(result.getCategoryName()).isEqualTo("Data Science");
+        assertThat(result.getBooks()).isEmpty();
     }
 
     @Test
@@ -93,5 +98,18 @@ public class CategoryServiceTest {
 
         // Then
         assertThat(ex.getMessage()).isEqualTo("La categoría ya existe");
+    }
+
+    @Test
+    void testReturnCategoryDTO() {
+        // Given
+        Category category = categories.getFirst();
+
+        // When
+        CategoryDTO result = categoryService.returnCategoryDTO(category);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getCategoryName()).isEqualTo(category.getCategoryName());
     }
 }
