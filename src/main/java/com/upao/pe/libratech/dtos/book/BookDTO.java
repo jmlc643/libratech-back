@@ -13,5 +13,5 @@ public class BookDTO {
     private TitleDTO title;
     private AuthorDTO author;
     private CategoryDTO category;
-    private Boolean available;
+    private boolean available;
 }

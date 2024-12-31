@@ -3,6 +3,7 @@ package com.upao.pe.libratech.unit;
 import com.upao.pe.libratech.dtos.author.AuthorDTO;
 import com.upao.pe.libratech.dtos.book.BookDTO;
 import com.upao.pe.libratech.dtos.book.CreateBookDTO;
+import com.upao.pe.libratech.dtos.book.UpdateBookDTO;
 import com.upao.pe.libratech.dtos.category.CategoryDTO;
 import com.upao.pe.libratech.dtos.title.TitleDTO;
 import com.upao.pe.libratech.exceptions.ResourceNotExistsException;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,9 +61,9 @@ public class BookServiceTest {
     void setUp() {
         books = List.of(
                 new Book(1, true,
-                        new Title(1, "Cien Años de Soledad", null),
-                        new Author(1, "Gabriel", "García Márquez", null),
-                        new Category(1, "Novela", null), null),
+                        new Title(1, "Cien Años de Soledad", Arrays.asList(new Book(), new Book())),
+                        new Author(1, "Gabriel", "García Márquez", Arrays.asList(new Book(), new Book())),
+                        new Category(1, "Novela", Arrays.asList(new Book(), new Book())), null),
                 new Book(2, true,
                         new Title(2, "La Casa de los Espíritus", null),
                         new Author(2, "Isabel", "Allende", null),
@@ -182,6 +184,61 @@ public class BookServiceTest {
     }
 
     @Test
+    void testUpdateBook() {
+        // Given
+        int id = 1;
+        UpdateBookDTO request = new UpdateBookDTO("Don Quijote", "Don Francisco", "Pizarro", "Cultura General");
+        AuthorDTO authorDTO = new AuthorDTO("Don Francisco", "Pizarro");
+        TitleDTO titleDTO = new TitleDTO("Don Quijote");
+        CategoryDTO categoryDTO = new CategoryDTO("Cultura General");
+
+        Author author = new Author(6, "Don Francisco", "Pizarro", new ArrayList<>());
+        Title title = new Title(6, "Don Quijote", new ArrayList<>());
+        Category category = new Category(6, "Cultura General", new ArrayList<>());
+
+        Book bookBeforeUpdate = books.getFirst();
+        Book bookAfterUpdate = new Book(1, true, title, author, category, null);
+
+        // When
+        when(bookRepository.findById(id)).thenReturn(Optional.of(bookBeforeUpdate));
+        when(titleService.updateTitle("Don Quijote", 1)).thenReturn(title);
+        when(authorService.updateAuthor("Don Francisco", "Pizarro", 1)).thenReturn(author);
+        when(categoryService.updateCategory("Cultura General", 1)).thenReturn(category);
+        when(titleService.returnTitleDTO(any(Title.class))).thenReturn(titleDTO);
+        when(authorService.returnAuthorDTO(any(Author.class))).thenReturn(authorDTO);
+        when(categoryService.returnCategoryDTO(any(Category.class))).thenReturn(categoryDTO);
+        when(bookRepository.save(any(Book.class))).thenReturn(bookAfterUpdate);
+        BookDTO result = bookService.updateBook(request, id);
+
+        // Then
+        ArgumentCaptor<Book> bookArgumentCaptor = ArgumentCaptor.forClass(Book.class);
+        verify(bookRepository).save(bookArgumentCaptor.capture());
+        assertThat(bookArgumentCaptor.getValue().getCategory().getCategoryName()).isEqualTo("Cultura General");
+        assertThat(bookArgumentCaptor.getValue().getTitle().getTitleName()).isEqualTo("Don Quijote");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIdBook()).isEqualTo(1);
+        assertThat(result.getAuthor().getAuthorName()).isEqualTo("Don Francisco");
+        assertThat(result.getAuthor().getAuthorLastName()).isEqualTo("Pizarro");
+        assertThat(result.getCategory().getCategoryName()).isEqualTo("Cultura General");
+        assertThat(result.getTitle().getTitleName()).isEqualTo("Don Quijote");
+        assertThat(result.isAvailable()).isEqualTo(true);
+    }
+
+    @Test
+    void testUpdateBookWhenTheBookNotExists() {
+        // Given
+        int id = 99999;
+
+        // When
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
+        ResourceNotExistsException ex = assertThrows(ResourceNotExistsException.class, () -> bookService.updateBook(new UpdateBookDTO("Title", "Name", "Last Name", "Category"), id));
+
+        // Then
+        assertThat(ex.getMessage()).isEqualTo("El libro con ID 99999 no existe");
+    }
+
+    @Test
     void testDeleteBook() {
         // Given
         int id = 5;
@@ -266,10 +323,4 @@ public class BookServiceTest {
         // Then
         assertThat(ex.getMessage()).isEqualTo("El libro con ID 666 no existe");
     }
-
-    /*
-
-    TESTEAR LOS METODOS UPDATE DE LOS SERVICIOS AUTHOR, TITLE Y CATEGORY
-
-    */
 }
