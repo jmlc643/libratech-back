@@ -115,4 +115,53 @@ public class BookControllerIntegrationTest {
                 .andExpect(jsonPath("$.category").value("Ciencias de la Computacion"))
                 .andExpect(jsonPath("$.available").value(true));
     }
+
+    @Test
+    void testUpdateBookWhenBookNotExists() throws Exception {
+        UpdateBookDTO request = new UpdateBookDTO("title", "author", "category");
+        String jsonRequest = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/book/update/99999").pathInfo("/99999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("El libro con ID 99999 no existe"));
+    }
+
+    @Test
+    void testUpdateBookWhenAtributtesAreEmptyOrNull() throws Exception {
+        CreateBookDTO request = new CreateBookDTO(null, "", " ");
+        String jsonRequest = objectMapper.writeValueAsString(request);
+
+        mockMvc.perform(put("/book/update/1").pathInfo("/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.errors", hasKey("title")))
+                .andExpect(jsonPath("$.errors", hasKey("author")))
+                .andExpect(jsonPath("$.errors.title", containsInAnyOrder("El titulo no puede ser null", "El titulo no puede ser un espacio en blanco", "El titulo no puede estar vacio")))
+                .andExpect(jsonPath("$.errors.author", containsInAnyOrder("El autor no puede estar vacio", "El autor no puede ser un espacio en blanco")))
+                .andExpect(jsonPath("$.errors.category", containsInAnyOrder("La categoria no puede ser un espacio en blanco")));
+    }
+
+    @Test
+    void testDeleteBook() throws Exception {
+        mockMvc.perform(delete("/book/delete/7").pathInfo("/7"))
+                .andExpect(status().isNoContent())
+                .andExpect(jsonPath("$[6].idBook").value(8))
+                .andExpect(jsonPath("$[6].title").value("Refactoring"))
+                .andExpect(jsonPath("$[6].author").value("Martin Fowler"))
+                .andExpect(jsonPath("$[6].category").value("Refactoring"))
+                .andExpect(jsonPath("$[6].available").value(true));
+    }
+
+    @Test
+    void testDeleteBookWhenBookNotExists() throws Exception {
+        mockMvc.perform(delete("/book/delete/99999").pathInfo("/99999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").value("El libro con ID 99999 no existe"));
+    }
 }
