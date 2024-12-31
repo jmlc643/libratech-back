@@ -1,4 +1,4 @@
-package com.upao.pe.libratech.unit;
+package com.upao.pe.libratech.unit.services;
 
 import com.upao.pe.libratech.dtos.author.AuthorDTO;
 import com.upao.pe.libratech.dtos.book.BookDTO;
@@ -322,5 +322,62 @@ public class BookServiceTest {
 
         // Then
         assertThat(ex.getMessage()).isEqualTo("El libro con ID 666 no existe");
+    }
+
+    @Test
+    void testGetBook() {
+        // Given
+        int id = 1;
+        Book book = books.getFirst();
+
+        // When
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+
+        Book result = bookService.getBook(id);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getIdBook()).isEqualTo(1);
+        assertThat(result.getCategory().getCategoryName()).isEqualTo("Novela");
+        assertThat(result.getAuthor().getAuthorName()).isEqualTo("Gabriel");
+        assertThat(result.getAuthor().getAuthorLastName()).isEqualTo("García Márquez");
+        assertThat(result.getTitle().getTitleName()).isEqualTo("Cien Años de Soledad");
+    }
+
+    @Test
+    void testGetBookWhenBookNotExists() {
+        // Give
+        int id = 99999;
+
+        // When
+        ResourceNotExistsException ex = assertThrows(ResourceNotExistsException.class, () -> bookService.deleteBook(id));
+
+        // Then
+        assertThat(ex.getMessage()).isEqualTo("El libro con ID 99999 no existe");
+    }
+
+    @Test
+    void testReturnBookDTO() {
+        // Give
+        Book book = books.getFirst();
+        AuthorDTO authorDTO = new AuthorDTO("Gabriel", "García Márquez");
+        TitleDTO titleDTO = new TitleDTO("Cien Años de Soledad");
+        CategoryDTO categoryDTO = new CategoryDTO("Novela");
+        BookDTO bookDTO = new BookDTO(1, titleDTO, authorDTO, categoryDTO, true);
+
+        // When
+        when(titleService.returnTitleDTO(any(Title.class))).thenReturn(titleDTO);
+        when(authorService.returnAuthorDTO(any(Author.class))).thenReturn(authorDTO);
+        when(categoryService.returnCategoryDTO(any(Category.class))).thenReturn(categoryDTO);
+
+        BookDTO result = bookService.returnBookDTO(book);
+
+        // Then
+        assertThat(result).isNotNull();
+        assertThat(result.getIdBook()).isEqualTo(bookDTO.getIdBook());
+        assertThat(result.isAvailable()).isEqualTo(bookDTO.isAvailable());
+        assertThat(result.getAuthor()).isEqualTo(bookDTO.getAuthor());
+        assertThat(result.getCategory()).isEqualTo(bookDTO.getCategory());
+        assertThat(result.getTitle()).isEqualTo(bookDTO.getTitle());
     }
 }

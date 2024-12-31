@@ -89,11 +89,11 @@ public class BookService {
         return findAll(PageRequest.of(0, 10));
     }
 
-    private BookDTO returnBookDTO(Book book) {
+    public BookDTO returnBookDTO(Book book) {
         return new BookDTO(book.getIdBook(), titleService.returnTitleDTO(book.getTitle()), authorService.returnAuthorDTO(book.getAuthor()), categoryService.returnCategoryDTO(book.getCategory()), book.isAvailable());
     }
 
-    protected Book getBook(int id) {
+    public Book getBook(int id) {
         Optional<Book> book = bookRepository.findById(id);
         if (book.isEmpty()) {
             throw new ResourceNotExistsException("El libro con ID "+id+" no existe");
