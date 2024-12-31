@@ -13,14 +13,10 @@ public class CreateBookDTO {
     @NotEmpty(message = "El titulo no puede estar vacio")
     @NotBlank(message = "El titulo no puede ser un espacio en blanco")
     private String title;
-    @NotNull(message = "El nombre no puede ser null")
-    @NotEmpty(message = "El nombre no puede estar vacio")
-    @NotBlank(message = "El nombre no puede ser un espacio en blanco")
-    private String authorName;
-    @NotNull(message = "El apellido no puede ser null")
-    @NotEmpty(message = "El apellido no puede estar vacio")
-    @NotBlank(message = "El apellido no puede ser un espacio en blanco")
-    private String authorLastName;
+    @NotNull(message = "El autor no puede ser null")
+    @NotEmpty(message = "El autor no puede estar vacio")
+    @NotBlank(message = "El autor no puede ser un espacio en blanco")
+    private String author;
     @NotNull(message = "La categoria no puede ser null")
     @NotEmpty(message = "La categoria no puede estar vacio")
     @NotBlank(message = "La categoria no puede ser un espacio en blanco")

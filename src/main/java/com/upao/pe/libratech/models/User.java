@@ -18,8 +18,8 @@ public class User {
     @Column(name = "id_user")
     private Integer idUser;
 
-    @Column(name = "user", length = 100, unique = true, nullable = false)
-    private String user;
+    @Column(name = "username", length = 100, unique = true, nullable = false)
+    private String username;
 
     @Column(name = "email", length = 100, unique = true, nullable = false)
     private String email;

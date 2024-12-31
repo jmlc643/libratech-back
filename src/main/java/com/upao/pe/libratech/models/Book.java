@@ -21,17 +21,14 @@ public class Book {
     @Column(name = "available", nullable = false)
     private boolean available;
 
-    @ManyToOne
-    @JoinColumn(name = "id_title", nullable = false)
-    private Title title;
+    @Column(name = "title", nullable = false)
+    private String title;
 
-    @ManyToOne
-    @JoinColumn(name = "id_author", nullable = false)
-    private Author author;
+    @Column(name = "author", nullable = false)
+    private String author;
 
-    @ManyToOne
-    @JoinColumn(name = "id_category", nullable = false)
-    private Category category;
+    @Column(name = "category", nullable = false)
+    private String category;
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
     private List<Loan> loans;

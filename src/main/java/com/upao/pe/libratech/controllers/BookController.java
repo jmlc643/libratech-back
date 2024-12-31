@@ -8,6 +8,8 @@ import com.upao.pe.libratech.services.BookService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,28 +21,28 @@ public class BookController {
     @Autowired private BookService bookService;
 
     @GetMapping("/list/")
-    public List<BookDTO> listBooks(@RequestParam int page) {
-        return bookService.findAll(PageRequest.of(page, 10));
+    public ResponseEntity<List<BookDTO>> listBooks(@RequestParam int page) {
+        return new ResponseEntity<>(bookService.findAll(PageRequest.of(page, 10)), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public BookDTO getBook(@PathVariable int id) {
+    public ResponseEntity<BookDTO> getBook(@PathVariable int id) {
         Book book = bookService.getBook(id);
-        return bookService.returnBookDTO(book);
+        return new ResponseEntity<>(bookService.returnBookDTO(book), HttpStatus.FOUND);
     }
 
     @PostMapping("/create/")
-    public BookDTO addBook(@Valid @RequestBody CreateBookDTO request){
-        return bookService.addBook(request);
+    public ResponseEntity<BookDTO> addBook(@Valid @RequestBody CreateBookDTO request){
+        return new ResponseEntity<>(bookService.addBook(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public BookDTO updateBook(@Valid @RequestBody UpdateBookDTO request, @PathVariable int id){
-        return bookService.updateBook(request, id);
+    public ResponseEntity<BookDTO> updateBook(@Valid @RequestBody UpdateBookDTO request, @PathVariable int id){
+        return new ResponseEntity<>(bookService.updateBook(request, id), HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/delete/{id}")
-    public List<BookDTO> deleteBook(@PathVariable int id){
-        return bookService.deleteBook(id);
+    public ResponseEntity<List<BookDTO>> deleteBook(@PathVariable int id){
+        return new ResponseEntity<>(bookService.deleteBook(id), HttpStatus.NO_CONTENT);
     }
 }
