@@ -1,8 +1,8 @@
 package com.upao.pe.libratech.unit;
 
-import com.upao.pe.libratech.dtos.author.AuthorDTO;
 import com.upao.pe.libratech.dtos.category.CategoryDTO;
 import com.upao.pe.libratech.exceptions.ResourceAlreadyExistsException;
+import com.upao.pe.libratech.models.Book;
 import com.upao.pe.libratech.models.Category;
 import com.upao.pe.libratech.repos.CategoryRepository;
 import com.upao.pe.libratech.services.CategoryService;
@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,11 +41,11 @@ public class CategoryServiceTest {
     @BeforeEach
     void setUp(){
         categories = List.of(
-                new Category (1, "Computer Science", null),
+                new Category (1, "Computer Science", List.of(new Book(1, true, null, null, null, null), new Book(2, false, null, null, null, null))),
                 new Category (2, "Software Engineering", null),
                 new Category (3, "Programming", null),
                 new Category (4,"Design", null),
-                new Category (5, "Artificial Intelligence", null)
+                new Category (5, "Artificial Intelligence", List.of(new Book(1, false, null, null, null, null)))
         );
     }
 
@@ -98,6 +99,53 @@ public class CategoryServiceTest {
 
         // Then
         assertThat(ex.getMessage()).isEqualTo("La categoría ya existe");
+    }
+
+    @Test
+    void testUpdatecategoryWhenBooksIsGreaterThanOne() {
+        // Given
+        int id = 1;
+        Category categoryBeforeUpdate = categories.getFirst();
+        Category categoryAfterUpdate = new Category(6, "Accion", List.of(new Book(1, true, null, null, categoryBeforeUpdate, null)));
+
+        // When
+        when(categoryRepository.findById(id)).thenReturn(Optional.of(categoryBeforeUpdate));
+        when(categoryRepository.existsByCategoryName("Accion")).thenReturn(false);
+        when(categoryRepository.save(any(Category.class))).thenReturn(categoryAfterUpdate);
+
+        Category result = categoryService.updateCategory(categoryAfterUpdate.getCategoryName(), id);
+
+        // Then
+        ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+        verify(categoryRepository).save(categoryArgumentCaptor.capture());
+        assertThat(categoryArgumentCaptor.getValue().getCategoryName()).isEqualTo("Accion");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIdCategory()).isEqualTo(6);
+        assertThat(result.getCategoryName()).isEqualTo("Accion");
+    }
+
+    @Test
+    void testUpdatecategoryWhenBooksIsEqualThanOne() {
+        // Given
+        int id = 5;
+        Category categoryBeforeUpdate = categories.getLast();
+        Category categoryAfterUpdate = new Category(5, "Novela Peruana", List.of(new Book(1, false, null, null, null, null)));
+
+        // When
+        when(categoryRepository.findById(id)).thenReturn(Optional.of(categoryBeforeUpdate));
+        when(categoryRepository.save(any(Category.class))).thenReturn(categoryAfterUpdate);
+
+        Category result = categoryService.updateCategory(categoryAfterUpdate.getCategoryName(), id);
+
+        // Then
+        ArgumentCaptor<Category> categoryArgumentCaptor = ArgumentCaptor.forClass(Category.class);
+        verify(categoryRepository).save(categoryArgumentCaptor.capture());
+        assertThat(categoryArgumentCaptor.getValue().getCategoryName()).isEqualTo("Novela Peruana");
+
+        assertThat(result).isNotNull();
+        assertThat(result.getIdCategory()).isEqualTo(5);
+        assertThat(result.getCategoryName()).isEqualTo("Novela Peruana");
     }
 
     @Test
