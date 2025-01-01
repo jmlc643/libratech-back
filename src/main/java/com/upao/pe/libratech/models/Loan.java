@@ -25,10 +25,10 @@ public class Loan {
     private Date returnDate;
 
     @ManyToOne
-    @JoinColumn(name = "id_user", nullable = false)
+    @JoinColumn(name = "id_user", nullable = false, referencedColumnName = "id_user")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "id_book", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_book", nullable = false, referencedColumnName = "id_book")
     private Book book;
 }

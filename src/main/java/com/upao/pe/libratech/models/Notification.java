@@ -24,7 +24,7 @@ public class Notification {
     @Column(name = "notification_date", nullable = false)
     private Date notificationDate;
 
-    @ManyToOne
-    @JoinColumn(name = "id_user", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_user", nullable = false, referencedColumnName = "id_user")
     private User user;
 }

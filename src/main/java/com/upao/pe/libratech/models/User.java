@@ -27,8 +27,8 @@ public class User {
     @Column(name = "password", length = 100, nullable = false)
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "id_role", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_role", nullable = false, referencedColumnName = "id_role")
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

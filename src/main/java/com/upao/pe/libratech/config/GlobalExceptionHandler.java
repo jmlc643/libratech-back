@@ -5,6 +5,7 @@ import com.upao.pe.libratech.exceptions.ResourceNotExistsException;
 import com.upao.pe.libratech.utils.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.FieldError;
@@ -55,5 +56,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleHttpRequestMethodNOtSupportedException(HttpRequestMethodNotSupportedException ex) {
         String errorMessage = "El método " + ex.getMethod() + " no está soportado para esta ruta.";
         return new ResponseEntity<>(errorMessage, HttpStatus.BAD_GATEWAY);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentialsException(BadCredentialsException ex) {
+        String errorMessage = ex.getMessage();
+        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
 }

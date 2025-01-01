@@ -78,7 +78,7 @@ INSERT INTO book (title, author, category, available) VALUES
                                                           ('Code Complete', 'Steve McConnell', 'Code Quality', TRUE),
                                                           ('The Art of Computer Programming', 'Donald Knuth', 'Algorithms', TRUE),
                                                           ('Domain-Driven Design', 'Eric Evans', 'Domain-Driven Design', TRUE),
-                                                          ('You Don\'t Know JS', 'Kyle Simpson', 'JavaScript', TRUE),
+                                                          ('You Dont Know JS', 'Kyle Simpson', 'JavaScript', TRUE),
     ('Head First Design Patterns', 'Eric Freeman', 'Patterns', TRUE),
     ('Cracking the Coding Interview', 'Gayle Laakmann McDowell', 'Interview Preparation', TRUE),
     ('The Clean Coder', 'Robert C. Martin', 'Best Practices', TRUE),
